@@ -58,9 +58,12 @@ img {
 
 .load-more {
   display: block;
+  margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
-  background-color: blue;
-  color: #fff;
+  margin-bottom: 20px;
+  background-color: cornflowerblue;
+  color: black;
   border-radius: 4px 4px 4px 4px;
+  border: none;
 }

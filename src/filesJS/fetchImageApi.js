@@ -18,7 +18,6 @@ export default class FetchImageApi {
     return getImagine()
       .then(images => {
         this.incrementPage();
-        // console.log(images.data);
         return images.data;
       })
       .catch(error => console.log('Error'));

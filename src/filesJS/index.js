@@ -18,18 +18,17 @@ refs.searchForm.addEventListener('submit', handleFormSubmit);
 refs.loadMore.addEventListener('click', handleBtnClick);
 refs.loadMore.style.display = 'none';
 
-function handleFormSubmit(evt) {
+async function handleFormSubmit(evt) {
   evt.preventDefault();
   if (refs.searchQueryInput.value === '') {
-    console.log('ok');
-    return Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.',
-    );
+    clearGalleryList();
+    refs.loadMore.style.display = 'none';
+    return;
   }
-  clearGalleryList();
+  
   fetchImageApi.searchQuery = evt.currentTarget.elements.searchQuery.value;
   fetchImageApi.resetPage();
-  fetchImageApi.fetchImage().then(data => {
+  const data = await fetchImageApi.fetchImage()
     if (data.hits.length === 0) {
       return Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.',
@@ -40,17 +39,15 @@ function handleFormSubmit(evt) {
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
     refs.loadMore.style.display = 'block';
     return renderImageList(data);
-  });
+  
 }
 
 function renderImageList(data) {
   const markup = data.hits
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
       return `<a class="gallery-item" href="${largeImageURL}"><div class="photo-card"> 
-        <img class="photo-image" src="${webformatURL}"  alt="${tags}" loading="lazy" />
-         
+        <img class="photo-image" src="${webformatURL}"  alt="${tags}" loading="lazy"/>
          <div class="info">
-         
            <p class="info-item">
              <b>Likes: ${likes}</b>
            </p>
@@ -71,15 +68,14 @@ function renderImageList(data) {
   let lightbox = new SimpleLightbox('.gallery a');
 }
 
-function handleBtnClick(data) {
-  return fetchImageApi.fetchImage().then(data => {
+async function handleBtnClick() {
+  const data = await fetchImageApi.fetchImage()
     iteratorPage += 40;
-    if(data.totalHits <= iteratorPage){
+    if (data.totalHits <= iteratorPage) {
       refs.loadMore.style.display = 'none';
-      return Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+      renderImageList(data);
+      return Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
     }
-    renderImageList(data);
-  });
 }
 function clearGalleryList() {
   refs.galleryList.innerHTML = '';
